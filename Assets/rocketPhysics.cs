@@ -12,6 +12,9 @@ public class rocketPhysics : MonoBehaviour
     public GameObject roidPrefab;
     public static GameObject s;
 
+    delegate void FireDelegate();
+    FireDelegate fire;
+
     public GameObject boom;
     public List<GameObject> enemylist;
     public List<GameObject> roidList;
@@ -50,15 +53,20 @@ public class rocketPhysics : MonoBehaviour
     }
 
 
-    // Start is called before the first frame update
-    void Start()
+
+
+// Start is called before the first frame update
+void Start()
     {
+        fire = NormalFire;
+
         if (s == null)
             s = this.gameObject;
         else {
             Debug.LogError("tried to reinitialize rocket singleton!");
             return;
         }
+        // simple comment
 
         GameObject.Find("gameOver").transform.localScale = new Vector3(0, 0, 0);
         GameObject.Find("RestartButton").transform.localScale = new Vector3(0, 0, 0);
@@ -80,6 +88,57 @@ public class rocketPhysics : MonoBehaviour
 
         StartCoroutine("LevelScale");
 
+    }
+
+    void MultiFire()
+    {
+        Transform foo;
+        GameObject[] bArray;
+
+        bArray = GameObject.FindGameObjectsWithTag("bullet");
+
+        if (bArray.Length > 0)
+        {
+            fire = NormalFire;
+            fire();
+            return;
+        }
+
+        for (float i = 0; i < 24; i++)
+        {
+            GameObject bullet = Instantiate(bulletPrefab);
+
+            foo = transform;
+            bullet.transform.position = foo.position;
+            bullet.transform.rotation = foo.rotation;
+            bullet.transform.Rotate(0, 0, 15f * i);
+
+            bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
+            Destroy(bullet, 2.0f);
+        }
+
+
+    }
+    void NormalFire()
+    {
+        Transform foo;
+        GameObject[] bArray;
+
+        bArray = GameObject.FindGameObjectsWithTag("bullet");
+
+        if (bArray.Length > 5)
+            return;
+
+        {
+            GameObject bullet = Instantiate(bulletPrefab);
+
+            foo = transform;
+            bullet.transform.position = foo.position;
+            bullet.transform.rotation = foo.rotation;
+
+            bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
+            Destroy(bullet, 2.0f);
+        }
     }
 
     IEnumerator LevelScale()
@@ -221,22 +280,7 @@ public class rocketPhysics : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Transform foo;
-            GameObject[] bArray;
-
-            bArray = GameObject.FindGameObjectsWithTag("bullet");
-
-            if (bArray.Length > 5)
-                return;
-
-            GameObject bullet = Instantiate(bulletPrefab);
-
-            foo = transform;
-            bullet.transform.position = foo.position;
-            bullet.transform.rotation = foo.rotation;
-            Vector3 vel = bullet.GetComponent<Rigidbody2D>().velocity;
-            bullet.GetComponent<Rigidbody2D>().AddForce(vel + (foo.up * magnitude * 40.0f));
-            Destroy(bullet, 2.0f);
+            fire();
         }
     }
     private void FixedUpdate()
@@ -249,6 +293,8 @@ public class rocketPhysics : MonoBehaviour
         {
             if (collision.gameObject.tag == "extraLife")
             {
+                fire = MultiFire;
+
                 GetComponent<AudioSource>().Play();
                 if (lives < 3)
                 {
