@@ -47,4 +47,8 @@ public class extraLifeController : MonoBehaviour
         x.a = 0f;
         rend.material.color = x;
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        rocketPhysics.AddLife();
+    }
 }

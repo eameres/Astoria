@@ -13,20 +13,21 @@ public class rocketPhysics : MonoBehaviour
     public static GameObject s;
 
     delegate void FireDelegate();
-    FireDelegate fire;
+    static FireDelegate fire;
 
     public GameObject boom;
     public List<GameObject> enemylist;
     public List<GameObject> roidList;
-    public int score;
-    public int level = 1;
+    public static int score;
+    public static int level = 1;
 
     int roidCount = 2;
+    int maxBullets = 5;
 
     bool reSpawning = false;
 
-    GameObject[] markers;
-    int lives = 4;
+    static GameObject[] markers;
+    static int lives = 4;
     bool shielded = true;
 
     // testing setters and getters 
@@ -60,6 +61,10 @@ void Start()
     {
         fire = NormalFire;
 
+        lives = 3;
+        level = 1;
+
+
         if (s == null)
             s = this.gameObject;
         else {
@@ -92,7 +97,6 @@ void Start()
 
     void MultiFire()
     {
-        Transform foo;
         GameObject[] bArray;
 
         bArray = GameObject.FindGameObjectsWithTag("bullet");
@@ -100,20 +104,26 @@ void Start()
         if (bArray.Length > 0)
         {
             fire = NormalFire;
+
+            foreach (GameObject bullet in bArray)
+                Destroy (bullet);
+
+            Debug.Log(GameObject.FindGameObjectsWithTag("bullet"));
+
+            maxBullets = 10;
             fire();
+            maxBullets = 5;
+
             return;
         }
 
-        for (float i = 0; i < 24; i++)
+        for (float i = 0; i < 8; i++)
         {
-            GameObject bullet = Instantiate(bulletPrefab);
+            GameObject bullet = Instantiate(bulletPrefab, transform.position,transform.rotation);
 
-            foo = transform;
-            bullet.transform.position = foo.position;
-            bullet.transform.rotation = foo.rotation;
-            bullet.transform.Rotate(0, 0, 15f * i);
-
+            bullet.transform.Rotate(0, 0, 360f/8f * i);
             bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
+
             Destroy(bullet, 2.0f);
         }
 
@@ -121,20 +131,15 @@ void Start()
     }
     void NormalFire()
     {
-        Transform foo;
         GameObject[] bArray;
 
         bArray = GameObject.FindGameObjectsWithTag("bullet");
 
-        if (bArray.Length > 5)
+        if (bArray.Length > maxBullets )
             return;
 
         {
-            GameObject bullet = Instantiate(bulletPrefab);
-
-            foo = transform;
-            bullet.transform.position = foo.position;
-            bullet.transform.rotation = foo.rotation;
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
 
             bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
             Destroy(bullet, 2.0f);
@@ -287,27 +292,31 @@ void Start()
     {
 
     }
+
+    public static void AddLife() {
+        fire = s.GetComponent <rocketPhysics >().MultiFire;
+
+        s.GetComponent<AudioSource>().Play();
+        if (lives < 3)
+        {
+            markers[lives].SetActive(true);
+            GameObject.Find("bonus").GetComponent<Text>().text = "";
+        }
+
+        lives += 1;
+
+        if (lives > 3)
+            GameObject.Find("bonus").GetComponent<Text>().text = "+" + (lives - 3);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag != "ScreenEdge")
         {
-            if (collision.gameObject.tag == "extraLife")
-            {
-                fire = MultiFire;
+            if ((collision.gameObject.tag != "roid") && (collision.gameObject.tag != "bullet"))
+                return;
 
-                GetComponent<AudioSource>().Play();
-                if (lives < 3)
-                {
-                    markers[lives].SetActive(true);
-                    GameObject.Find("bonus").GetComponent<Text>().text = "";
-                }
-
-                lives += 1;
-
-                if (lives > 3)
-                    GameObject.Find("bonus").GetComponent<Text>().text = "+" + (lives - 3);
-            }
-            else if ((lives > 0) && !shielded)
+            if ((lives > 0) && !shielded)
             {
                 gameObject.GetComponent<SpriteRenderer>().enabled = false;
 

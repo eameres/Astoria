@@ -37,7 +37,7 @@ public class enemy : MonoBehaviour
     {
         GameObject bullet = Instantiate(bulletPrefab);
         Transform foo;
-        int level = player.GetComponent<rocketPhysics>().level;
+        int level = rocketPhysics.level;
 
         foo = transform;
         bullet.transform.position = foo.position;
@@ -72,7 +72,7 @@ public class enemy : MonoBehaviour
 
         if (collision.gameObject.tag == "bullet")
         {
-            player.GetComponent<rocketPhysics>().IncrementScore ();
+            player.GetComponent<rocketPhysics>().IncrementScore();
 
             GameObject xploder = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             Destroy(xploder, 6f);

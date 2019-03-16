@@ -9,6 +9,8 @@ TagManager:
   - playerMarker
   - extraLife
   - roid
+  - multiFIre
+  - landMine
   layers:
   - Default
   - TransparentFX
