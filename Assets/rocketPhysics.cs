@@ -6,10 +6,14 @@ using UnityEngine.UI;
 public class rocketPhysics : MonoBehaviour
 {
     public float magnitude;
+
     public GameObject bulletPrefab;
     public GameObject enemyPrefab;
     public GameObject extraLifePrefab;
     public GameObject roidPrefab;
+    public GameObject landMinePrefab;
+    public GameObject landMineTrigger;
+
     public static GameObject s;
 
     delegate void FireDelegate();
@@ -106,7 +110,7 @@ void Start()
             fire = NormalFire;
 
             foreach (GameObject bullet in bArray)
-                Destroy (bullet);
+                Destroy(bullet);
 
             Debug.Log(GameObject.FindGameObjectsWithTag("bullet"));
 
@@ -119,16 +123,32 @@ void Start()
 
         for (float i = 0; i < 8; i++)
         {
-            GameObject bullet = Instantiate(bulletPrefab, transform.position,transform.rotation);
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
 
-            bullet.transform.Rotate(0, 0, 360f/8f * i);
+            bullet.transform.Rotate(0, 0, 360f / 8f * i);
             bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
 
             Destroy(bullet, 2.0f);
         }
+    }
+    void DropMine()
+    {
+        GameObject[] bArray;
 
+        bArray = GameObject.FindGameObjectsWithTag("bullet");
+
+        if (bArray.Length > maxBullets)
+            return;
+
+        {
+            GameObject bullet = Instantiate(landMinePrefab, transform.position, transform.rotation);
+
+            //bullet.GetComponent<Rigidbody2D>().AddForce((bullet.transform.up * magnitude * 40.0f));
+            Destroy(bullet, 15.0f);
+        }
 
     }
+
     void NormalFire()
     {
         GameObject[] bArray;
@@ -237,7 +257,14 @@ void Start()
 
     void SpawnExtralife()
     {
-        GameObject extra = Instantiate(extraLifePrefab, new Vector3(Random.Range(-8f, 8f), Random.Range(-4.9f, 4.9f), 0), Quaternion.identity);
+        GameObject bonus;
+
+        if (Random.value > .5)
+            bonus = extraLifePrefab;
+        else
+            bonus = landMineTrigger;
+
+        GameObject extra = Instantiate(bonus, new Vector3(Random.Range(-8f, 8f), Random.Range(-4.9f, 4.9f), 0), Quaternion.identity);
         Destroy(extra, 7.1f);
         Invoke("SpawnExtralife", Random.Range(10f,15f));
     }
@@ -307,6 +334,14 @@ void Start()
 
         if (lives > 3)
             GameObject.Find("bonus").GetComponent<Text>().text = "+" + (lives - 3);
+    }
+
+    public static void AddLandMines()
+    {
+        fire = s.GetComponent<rocketPhysics>().DropMine;
+
+        s.GetComponent<AudioSource>().Play();
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

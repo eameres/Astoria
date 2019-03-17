@@ -70,7 +70,7 @@ public class enemy : MonoBehaviour
     {
         Debug.Log("collided: "+ collision.gameObject.tag);
 
-        if (collision.gameObject.tag == "bullet")
+        if ((collision.gameObject.tag == "bullet") || (collision.gameObject.tag == "landMine"))
         {
             player.GetComponent<rocketPhysics>().IncrementScore();
 

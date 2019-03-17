@@ -62,7 +62,7 @@ public class BigRoid : MonoBehaviour
     {
         Debug.Log("collided: " + collision.gameObject.tag);
 
-        if (collision.gameObject.tag == "bullet")
+        if ((collision.gameObject.tag == "bullet") || (collision.gameObject.tag == "landMine"))
         {
             GameObject xploder = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             Destroy(xploder, 6f);

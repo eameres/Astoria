@@ -50,5 +50,6 @@ public class extraLifeController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         rocketPhysics.AddLife();
+        Destroy(gameObject);
     }
 }
