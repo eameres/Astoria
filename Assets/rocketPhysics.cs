@@ -14,6 +14,11 @@ public class rocketPhysics : MonoBehaviour
     public GameObject landMinePrefab;
     public GameObject landMineTrigger;
 
+
+    public Sprite normal;
+    public Sprite lmSprite;
+    public Sprite multiSprite;
+
     public static GameObject s;
 
     delegate void FireDelegate();
@@ -68,6 +73,7 @@ void Start()
         lives = 3;
         level = 1;
 
+        Debug .Log  (MyFuncs.AplusB(1, 2));
 
         if (s == null)
             s = this.gameObject;
@@ -279,6 +285,19 @@ void Start()
     // Update is called once per frame
     void Update()
     {
+        SpriteRenderer rend = GetComponent<SpriteRenderer>();
+
+        if (fire == DropMine)
+        {
+            rend.sprite = lmSprite;
+        }
+        else if (fire == MultiFire)
+        {
+            rend.sprite = multiSprite;
+        }
+        else
+            rend.sprite = normal;
+
         if ((lives <= 0) || reSpawning)
             return;
 

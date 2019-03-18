@@ -137,6 +137,8 @@ MonoBehaviour:
     type: 3}
   explosionPrefab: {fileID: 5924424976098543169, guid: b2ec62c8eb0ca42f8bddbfffdecb2ecf,
     type: 3}
+  idleSprite: {fileID: 21300000, guid: 56333afa39cd62b4298f591910f04bc5, type: 3}
+  lockedSprite: {fileID: 21300000, guid: 767780ce78b8bdf4ebcb0231280c9655, type: 3}
 --- !u!82 &3117437915959665475
 AudioSource:
   m_ObjectHideFlags: 0
